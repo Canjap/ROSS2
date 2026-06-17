@@ -5,27 +5,22 @@ import time
 import cv2
 from loguru import logger
 import numpy as np
-import typer
-
 from ROSS1.ross.net.discovery import discover_host
 from ROSS1.ross.net.robot import send_motor, send_stop, stream_url
+import typer
 
 
 def teleop(
     host: str = typer.Option(
         None, "--host", help="robot IP or hostname (default: auto-discover via mDNS)"
     ),
-    speed: int = typer.Option(
-        180, "--speed", min=0, max=255, help="motor speed 0-255"
-    ),
+    speed: int = typer.Option(180, "--speed", min=0, max=255, help="motor speed 0-255"),
 ) -> None:
     """Drive ROSS over WiFi with WASD/arrow keys; shows the MJPEG stream."""
     if not host:
         host = discover_host()
         if not host:
-            logger.error(
-                "Could not find ROSS on the network. Use --host to specify manually."
-            )
+            logger.error("Could not find ROSS on the network. Use --host to specify manually.")
             raise typer.Exit(code=1)
 
     logger.info(f"Teleop: host={host} speed={speed}")

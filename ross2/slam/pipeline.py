@@ -5,7 +5,6 @@ import sys
 import time
 
 import cv2
-
 from ROSS1.ross.net.discovery import discover_host
 from ROSS1.ross.net.robot import fetch_imu, stream_url
 from ROSS1.ross.slam.io import save_scan
@@ -108,9 +107,7 @@ def capture_frames(host: str, model, transform, device, use_imu: bool = True):
                     if len(frames) == 1:
                         print("    [IMU] Not available — using yaw sweep only")
 
-            last_depth_vis = cv2.applyColorMap(
-                (depth * 255).astype("uint8"), cv2.COLORMAP_MAGMA
-            )
+            last_depth_vis = cv2.applyColorMap((depth * 255).astype("uint8"), cv2.COLORMAP_MAGMA)
 
             if len(frames) >= MAX_FRAMES:
                 print("[Capture] Max frames reached.")

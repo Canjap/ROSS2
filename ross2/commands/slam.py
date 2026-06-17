@@ -2,23 +2,18 @@
 
 from pathlib import Path
 
-import typer
-
 from ROSS1.ross.config import MODELS_DIR, OUTPUTS_DIR
+import typer
 
 
 def slam(
-    host: str = typer.Option(
-        None, "--host", help="robot IP or hostname (default: auto-discover)"
-    ),
+    host: str = typer.Option(None, "--host", help="robot IP or hostname (default: auto-discover)"),
     model: str = typer.Option(
         "DPT_Hybrid",
         "--model",
         help="MiDaS model — DPT_Large | DPT_Hybrid | MiDaS_small",
     ),
-    no_imu: bool = typer.Option(
-        False, "--no-imu", help="skip IMU; use pure yaw sweep for pose"
-    ),
+    no_imu: bool = typer.Option(False, "--no-imu", help="skip IMU; use pure yaw sweep for pose"),
     no_yolo: bool = typer.Option(False, "--no-yolo", help="skip human detection"),
     output: Path = typer.Option(
         OUTPUTS_DIR / "scan",

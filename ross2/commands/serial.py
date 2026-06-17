@@ -12,11 +12,10 @@ import time
 import tty
 
 from loguru import logger
-import serial as pyserial
-import typer
-
 from ROSS1.ross.drivers.gpio import output_low as gpio_output_low
 from ROSS1.ross.drivers.gpio import release as gpio_release
+import serial as pyserial
+import typer
 
 DEFAULT_PORT = "/dev/ttyAMA0"
 DEFAULT_BAUD = 115200
@@ -24,9 +23,7 @@ DEFAULT_SPEED = 180
 DEFAULT_GPIO = 17
 LISTEN_SECONDS = 3
 
-app = typer.Typer(
-    help="UART-level debugging (GPIO 0 + serial).", no_args_is_help=True
-)
+app = typer.Typer(help="UART-level debugging (GPIO 0 + serial).", no_args_is_help=True)
 
 HELP_TEXT = """
 ROSS Serial Teleop
@@ -45,12 +42,8 @@ ROSS Serial Teleop
 def serial_test(
     port: str = typer.Option(DEFAULT_PORT, "--port", help="serial port"),
     baud: int = typer.Option(DEFAULT_BAUD, "--baud", help="baud rate"),
-    gpio: int = typer.Option(
-        DEFAULT_GPIO, "--gpio", help="RPi GPIO pin wired to ESP32 GPIO 0"
-    ),
-    timeout: int = typer.Option(
-        LISTEN_SECONDS, "--timeout", help="seconds to listen for data"
-    ),
+    gpio: int = typer.Option(DEFAULT_GPIO, "--gpio", help="RPi GPIO pin wired to ESP32 GPIO 0"),
+    timeout: int = typer.Option(LISTEN_SECONDS, "--timeout", help="seconds to listen for data"),
 ) -> None:
     """Verify UART connectivity — hold GPIO 0 low, wait for RST, listen for bytes."""
     print(f"→ Driving GPIO {gpio} LOW (boot mode select)")
@@ -62,14 +55,10 @@ def serial_test(
     print()
 
     try:
-        subprocess.run(
-            ["stty", "-F", port, str(baud), "raw", "-echo"], check=True
-        )
+        subprocess.run(["stty", "-F", port, str(baud), "raw", "-echo"], check=True)
         print(f"→ Listening on {port} at {baud} baud for {timeout}s...")
         print()
-        result = subprocess.run(
-            ["timeout", str(timeout), "cat", port], capture_output=True
-        )
+        result = subprocess.run(["timeout", str(timeout), "cat", port], capture_output=True)
         data = result.stdout
         if data:
             print(f"✓ Received {len(data)} bytes — UART link is working!")
@@ -95,12 +84,8 @@ def serial_test(
 def serial_teleop(
     port: str = typer.Option(DEFAULT_PORT, "--port", help="serial port"),
     baud: int = typer.Option(DEFAULT_BAUD, "--baud", help="baud rate"),
-    speed: int = typer.Option(
-        DEFAULT_SPEED, "--speed", min=0, max=255, help="motor speed 0-255"
-    ),
-    no_handshake: bool = typer.Option(
-        False, "--no-handshake", help="skip the boot handshake"
-    ),
+    speed: int = typer.Option(DEFAULT_SPEED, "--speed", min=0, max=255, help="motor speed 0-255"),
+    no_handshake: bool = typer.Option(False, "--no-handshake", help="skip the boot handshake"),
 ) -> None:
     """Drive ROSS motors over UART (no WiFi). Requires ESP32 in serial mode."""
     try:
@@ -115,8 +100,7 @@ def serial_teleop(
             if not _handshake(ser):
                 logger.error("Handshake failed — ESP32 did not enter serial mode")
                 logger.info(
-                    "Tip: press RST right before running this command, "
-                    "or pass --no-handshake"
+                    "Tip: press RST right before running this command, or pass --no-handshake"
                 )
                 raise typer.Exit(code=1)
 

@@ -5,13 +5,12 @@ import time
 import cv2
 import numpy as np
 import open3d as o3d
-from scipy.ndimage import median_filter
-
 from ROSS1.ross.slam.vision import (
     PersonTracker,
     appearance_embedding,
     detect_people,
 )
+from scipy.ndimage import median_filter
 
 TOTAL_YAW_DEGREES = 360.0
 
@@ -192,9 +191,7 @@ def build_scene(frame_data, yolo_model, imu_readings=None):
         if USE_ICP_REFINEMENT and i > 0 and len(merged.points) > 100:
             pcd_ds = pcd.voxel_down_sample(VOXEL_ICP)
             merged_ds = merged.voxel_down_sample(VOXEL_ICP)
-            pcd_ds.estimate_normals(
-                o3d.geometry.KDTreeSearchParamHybrid(radius=0.12, max_nn=30)
-            )
+            pcd_ds.estimate_normals(o3d.geometry.KDTreeSearchParamHybrid(radius=0.12, max_nn=30))
             merged_ds.estimate_normals(
                 o3d.geometry.KDTreeSearchParamHybrid(radius=0.12, max_nn=30)
             )
@@ -204,9 +201,7 @@ def build_scene(frame_data, yolo_model, imu_readings=None):
                 ICP_MAX_DIST,
                 np.eye(4),
                 o3d.pipelines.registration.TransformationEstimationPointToPlane(),
-                o3d.pipelines.registration.ICPConvergenceCriteria(
-                    max_iteration=ICP_MAX_ITER
-                ),
+                o3d.pipelines.registration.ICPConvergenceCriteria(max_iteration=ICP_MAX_ITER),
             )
             if result.fitness > 0.25:
                 pcd.transform(result.transformation)
@@ -233,15 +228,11 @@ def build_scene(frame_data, yolo_model, imu_readings=None):
     merged, _ = merged.remove_statistical_outlier(
         nb_neighbors=STAT_NB_NEIGHBORS, std_ratio=STAT_STD_RATIO
     )
-    merged, _ = merged.remove_radius_outlier(
-        nb_points=RADIUS_MIN_PTS, radius=RADIUS_RADIUS
-    )
+    merged, _ = merged.remove_radius_outlier(nb_points=RADIUS_MIN_PTS, radius=RADIUS_RADIUS)
     print(f"[Build] Clean cloud: {len(merged.points):,} points")
 
     print("[Build] Estimating normals ...")
-    merged.estimate_normals(
-        o3d.geometry.KDTreeSearchParamHybrid(radius=0.12, max_nn=30)
-    )
+    merged.estimate_normals(o3d.geometry.KDTreeSearchParamHybrid(radius=0.12, max_nn=30))
     centre = np.asarray(merged.points).mean(axis=0)
     merged.orient_normals_towards_camera_location(centre)
 
@@ -250,9 +241,7 @@ def build_scene(frame_data, yolo_model, imu_readings=None):
         merged, depth=POISSON_DEPTH
     )
     densities = np.asarray(densities)
-    mesh.remove_vertices_by_mask(
-        densities < np.percentile(densities, POISSON_DENSITY_PCT)
-    )
+    mesh.remove_vertices_by_mask(densities < np.percentile(densities, POISSON_DENSITY_PCT))
     mesh.compute_vertex_normals()
     print(f"[Build] Mesh: {len(mesh.vertices):,} verts  {len(mesh.triangles):,} tris")
 
@@ -321,14 +310,11 @@ def view_scene(mesh, pcd, people, mesh_path=None) -> None:
     ok = vis.create_window(window_name="ROSS Room Scan", width=1440, height=900)
     opt = vis.get_render_option()
     if not ok or opt is None:
-        print(
-            "[Viewer] Open3D could not create a GL window "
-            "(Wayland/GLEW init failed)."
-        )
+        print("[Viewer] Open3D could not create a GL window (Wayland/GLEW init failed).")
         print("         Scan files are saved — open them with:")
         hint_path = mesh_path or "<scan>.ply"
         print(
-            "           python -c \"import open3d as o3d; "
+            '           python -c "import open3d as o3d; '
             f"o3d.visualization.draw_geometries(["
             f"o3d.io.read_triangle_mesh('{hint_path}')])\""
         )

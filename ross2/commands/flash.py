@@ -16,10 +16,9 @@ from pathlib import Path
 import subprocess
 import time
 
-import typer
-
 from ROSS1.ross.drivers.gpio import output_low as gpio_output_low
 from ROSS1.ross.drivers.gpio import release as gpio_release
+import typer
 
 DEFAULT_BOOT_GPIO = 17
 DEFAULT_PORT = "/dev/ttyAMA0"
@@ -59,17 +58,13 @@ def flash(
     chip_id: bool = typer.Option(
         False, "--chip-id", help="Only check chip connectivity (don't flash)."
     ),
-    erase: bool = typer.Option(
-        False, "--erase", help="Erase entire flash before writing."
-    ),
+    erase: bool = typer.Option(False, "--erase", help="Erase entire flash before writing."),
     port: str = typer.Option(DEFAULT_PORT, "--port", help="Serial port."),
     baud: str = typer.Option(DEFAULT_BAUD, "--baud", help="Baud rate for flashing."),
 ) -> None:
     """Flash firmware onto ESP32-CAM over UART (RPi drives GPIO 0)."""
     if not chip_id and not images:
-        raise typer.BadParameter(
-            "Provide at least one firmware image, or use --chip-id."
-        )
+        raise typer.BadParameter("Provide at least one firmware image, or use --chip-id.")
 
     gpio = DEFAULT_BOOT_GPIO
     print(f"→ Driving GPIO {gpio} LOW (selecting flash mode)")
@@ -92,9 +87,7 @@ def flash(
                 raise typer.Exit(code=rc)
             if images:
                 print()
-                input(
-                    "  Press RST on the ESP32-CAM again, then press Enter here... "
-                )
+                input("  Press RST on the ESP32-CAM again, then press Enter here... ")
                 print()
 
         if images:

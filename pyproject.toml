@@ -38,13 +38,13 @@ detection = [
 
 [tool.ruff]
 line-length = 99
-src = ["ross"]
-include = ["pyproject.toml", "ross/**/*.py"]
+src = ["ross2"]
+include = ["pyproject.toml", "ross2/**/*.py"]
 extend-exclude = ["notebooks"]
 
 [tool.ruff.lint]
 extend-select = ["I"]
 
 [tool.ruff.lint.isort]
-known-first-party = ["ross"]
+known-first-party = ["ross2"]
 force-sort-within-sections = true
