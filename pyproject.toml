@@ -3,43 +3,37 @@ requires = ["flit_core >=3.2,<4"]
 build-backend = "flit_core.buildapi"
 
 [project]
-name = "ross"
-version = "0.0.1"
-description = "Remote Observation Scout Suite — ESP32-CAM scout robot + Raspberry Pi station."
+name = "ross2"
+version = "0.1.0"
+description = "Tunnel scouting prototype - Pi local capture, streaming server, and pipe detection."
 authors = [
   { name = "The Cooper Union for the Advancement of Science and Art" },
 ]
 license = { file = "LICENSE" }
 readme = "README.md"
-classifiers = [
-    "Programming Language :: Python :: 3",
-    "License :: OSI Approved :: MIT License",
-]
-dependencies = [
-    "esptool",
-    "loguru",
-    "opencv-python>=4.8",
-    "pyserial",
-    "python-dotenv",
-    "smbus2>=0.6.0",
-    "typer>=0.12",
-    "zeroconf>=0.80",
-]
 requires-python = "~=3.12.0"
 
+# Core dependencies needed to run the CLI and local streaming server
+dependencies = [
+    "fastapi>=0.110.0",
+    "loguru",
+    "opencv-python-headless>=4.8.0", # Headless avoids X11/GUI display dependency issues on a Pi CLI
+    "python-dotenv",
+    "typer>=0.12",
+    "uvicorn>=0.28.0",
+]
+
 [project.scripts]
-ross = "ross.cli:app"
+ross = "ross2.cli:app"
 
 [project.optional-dependencies]
 dev = ["ruff"]
-slam = [
-    "open3d",
-    "opencv-python",
-    "scipy",
-    "timm",
-    "torch",
+# Grouped CV/Deep Learning libraries for your partner's base model
+detection = [
+    "numpy>=1.26.0",
+    "torch>=2.2.0",
     "torchvision",
-    "ultralytics",
+    "ultralytics", # Included for YOLOv8/object detection workflows
 ]
 
 [tool.ruff]
