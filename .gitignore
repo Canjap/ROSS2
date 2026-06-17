@@ -1,1 +1,51 @@
+# Old ROSS setup
 ROSS1/
+
+# Project
+/data/
+.env
+.mcp.json
+
+# SLAM outputs / model weights
+*.ply
+*.pt
+outputs/*
+!outputs/.gitkeep
+models/*
+!models/.gitkeep
+
+# PlatformIO
+.pio/
+
+# OS / editor
+.DS_Store
+*.swp
+*.swo
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+*.egg
+dist/
+build/
+.eggs/
+.Python
+MANIFEST
+
+# Testing
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+
+# Environments
+.venv
+venv/
+env/
+
+# Tools
+.ruff_cache/
+.mypy_cache/
