@@ -1,0 +1,29 @@
+name: Code Quality Check
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  verify-code:
+    runs-on: ubuntu-latest
+
+    steps:
+    # 1. Clone the repository files onto the runner
+    - name: Check out repository
+      uses: actions/checkout@v4
+
+    # 2. Install Astral's uv environment manager
+    - name: Set up uv
+      uses: astral-sh/setup-uv@v5
+      with:
+        enable-cache: true
+        python-version: "3.12"
+
+    # 3. Run ruff to enforce code style compliance
+    - name: Lint and Format with Ruff
+      run: |
+        uv run ruff check .
+        uv run ruff format --check .
