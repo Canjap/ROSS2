@@ -49,3 +49,6 @@ env/
 # Tools
 .ruff_cache/
 .mypy_cache/
+
+# External models
+.xml
