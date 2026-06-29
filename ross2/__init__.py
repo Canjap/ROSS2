@@ -1,1 +1,1 @@
-from ROSS1.ross import config  # noqa: F401
+from ross2 import config  # noqa: F401

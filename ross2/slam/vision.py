@@ -2,7 +2,7 @@ from typing import Generator
 
 import cv2
 from loguru import logger
-
+import time
 # Load the cascade classifier globally once
 face_cascade = cv2.CascadeClassifier("haarcascade_frontalface_default.xml")
 
@@ -28,6 +28,7 @@ def stream_local_frames(
             success, frame = cap.read()
             if not success:
                 logger.warning("Dropped frame detected; restarting hardware read capture.")
+                time.sleep(0.1)
                 continue
 
             # Only run the heavy math and annotations if the user requested the detection endpoint
