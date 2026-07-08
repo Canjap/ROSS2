@@ -58,7 +58,15 @@ async def human_detection_feed():
         stream_local_frames(camera_index=-1, enable_detection=True, model="hog"),
         media_type="multipart/x-mixed-replace; boundary=frame",
     )
-
+# ---------------------------------------------------------
+# ENDPOINT 4: YOLO Human Detection
+# ---------------------------------------------------------
+@server_app.get("/yolo")
+async def human_detection_feed():
+    return StreamingResponse(
+        stream_local_frames(camera_index=-1, enable_detection=True, model="yolo"),
+        media_type="multipart/x-mixed-replace; boundary=frame",
+    )
 @app.command(name="stream_pi")
 def stream_server(port: int = 8080):
     active_ip = get_local_ip()
@@ -68,10 +76,13 @@ def stream_server(port: int = 8080):
     if active_ip != "127.0.0.1":
         typer.echo(f"  Raw Video Stream:       http://{active_ip}:{port}/live")
         typer.echo(f"  Detection Stream:       http://{active_ip}:{port}/cascade")
-        typer.echo(f"  Detection Stream:       http://{active_ip}:{port}/hog ")        
+        typer.echo(f"  Detection Stream:       http://{active_ip}:{port}/hog ")
+        typer.echo(f"  Detection Stream:       http://{active_ip}:{port}/yolo ")        
+                
     else:
         typer.echo(f"  Raw Video Stream:       http://localhost:{port}/live")
         typer.echo(f"  Detection Stream:       http://{active_ip}:{port}/cascade")
         typer.echo(f"  Detection Stream:       http://{active_ip}:{port}/hog")   
+        typer.echo(f"  Detection Stream:       http://{active_ip}:{port}/yolo ")                
     typer.echo("")
     uvicorn.run(server_app, host="0.0.0.0", port=port)

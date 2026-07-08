@@ -4,6 +4,7 @@ import numpy as np  # <-- Added missing numpy import
 from typing import Generator
 from loguru import logger
 from picamera2 import Picamera2
+from ultralytics import YOLO
 
 # 1. Initialize the camera GLOBALLY
 try:
@@ -15,11 +16,11 @@ try:
 except Exception as e:
     logger.error(f"Failed to initialize global camera: {e}")
 
-# Initialize both models once at startup
+# Initialize models once at startup
 hog = cv2.HOGDescriptor()
 hog.setSVMDetector(cv2.HOGDescriptor_getDefaultPeopleDetector())
 face_cascade = cv2.CascadeClassifier("haarcascade_frontalface_default.xml")
-
+yolo = YOLO('yolo26n.pt')
 
 def detector(frame, model):
     """Applies the selected detection math to the frame in-place."""
@@ -61,6 +62,13 @@ def detector(frame, model):
             (0, 0, 255),
             2,
         )
+    
+    
+    elif model=="yolo":
+        results = yolo(frame, classes=[0], conf=0.5, verbose=False)
+        human_count = len(results[0].boxes)
+        frame = results[0].plot()
+
         
     return frame
 
