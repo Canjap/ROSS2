@@ -67,6 +67,17 @@ async def human_detection_feed():
         stream_local_frames(camera_index=-1, enable_detection=True, model="yolo"),
         media_type="multipart/x-mixed-replace; boundary=frame",
     )
+
+# ---------------------------------------------------------
+# ENDPOINT 4: YOLO Human Detection
+# ---------------------------------------------------------
+@server_app.get("/move_vision")
+async def human_detection_feed():
+    return StreamingResponse(
+        stream_frames_movement(camera_index=-1, enable_detection=True, model="cascade"),
+        media_type="multipart/x-mixed-replace; boundary=frame",
+    )
+    
 @app.command(name="stream_pi")
 def stream_server(port: int = 8080):
     active_ip = get_local_ip()
