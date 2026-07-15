@@ -6,7 +6,35 @@ from loguru import logger
 from picamera2 import Picamera2
 from ultralytics import YOLO
 
-# 1. Initialize the camera GLOBALLY
+
+# PICAR
+from picarx.utils import reset_mcu
+from picarx import Picarx
+from time import sleep, time, strftime, localtime
+import readchar
+
+reset_mcu()
+sleep(0.2)
+
+manual = '''
+Press key to call the function(non-case sensitive):
+
+    O: speed up
+    P: speed down
+    W: forward  
+    S: backward
+    A: turn left
+    D: turn right
+    F: stop
+    T: take photo
+
+    Ctrl+C: quit
+'''
+
+# Initialize Picar
+px = Picarx()
+
+# Initialize the camera GLOBALLY
 try:
     picam2 = Picamera2()
     config = picam2.create_preview_configuration(main={"size": (640, 480)})
@@ -21,6 +49,78 @@ hog = cv2.HOGDescriptor()
 hog.setSVMDetector(cv2.HOGDescriptor_getDefaultPeopleDetector())
 face_cascade = cv2.CascadeClassifier("haarcascade_frontalface_default.xml")
 yolo = YOLO('yolo26n.pt')
+
+def move(operate, speed):
+
+    if operate == 'stop':
+        px.stop()  
+    else:
+        if operate == 'forward':
+            px.set_dir_servo_angle(0)
+            px.forward(speed)
+        elif operate == 'backward':
+            px.set_dir_servo_angle(0)
+            px.backward(speed)
+        elif operate == 'turn left':
+            px.set_dir_servo_angle(-30)
+            px.forward(speed)
+        elif operate == 'turn right':
+            px.set_dir_servo_angle(30)
+            px.forward(speed)
+
+def movement_control():
+    
+    speed = 0
+    status = "stop"
+    
+    sleep(2) 
+    print(manual)
+    print("\rstatus: %s , speed: %s    "%(status, speed), end='', flush=True)
+
+    # Keyboard control --- must be put under a while loop to work
+    # readkey
+    key = readchar.readkey().lower()
+    # operation 
+    if key in ('wsadfop'):
+        # throttle
+        if key == 'o':
+            if speed <=90:
+                speed += 10           
+        elif key == 'p':
+            if speed >=10:
+                speed -= 10
+            if speed == 0:
+                status = 'stop'
+        # direction
+        elif key in ('wsad'):
+            if speed == 0:
+                speed = 10
+            if key == 'w':
+                # Speed limit when reversing,avoid instantaneous current too large
+                if status != 'forward' and speed > 60:  
+                    speed = 60
+                status = 'forward'
+            elif key == 'a':
+                status = 'turn left'
+            elif key == 's':
+                if status != 'backward' and speed > 60: # Speed limit when reversing
+                    speed = 60
+                status = 'backward'
+            elif key == 'd':
+                status = 'turn right' 
+        # stop
+        elif key == 'f':
+            status = 'stop'
+        # move 
+        move(status, speed)  
+
+    # quit
+    elif key == readchar.key.CTRL_C:
+        print('\nquiting movement script ...')
+        px.stop()
+        break 
+
+        sleep(0.1)
 
 def detector(frame, model):
     """Applies the selected detection math to the frame in-place."""
@@ -105,6 +205,44 @@ def stream_local_frames(
                 b"--frame\r\n"
                 b"Content-Type: image/jpeg\r\n\r\n" + encoded_jpg.tobytes() + b"\r\n"
             )
+            
+    except GeneratorExit:
+        logger.info("Client disconnected. Leaving camera running for next connection.")
+        
+def stream_frames_movement(
+    camera_index: int = 0, enable_detection: bool = False, model: str = "cascade"
+) -> Generator[bytes, None, None]:
+    """Yields frames from the globally running Picamera2 buffer."""
+    
+    logger.info(f"New client connected! (Detection: {enable_detection}, Model: {model})")
+
+    try:
+        while True:
+            # Pull the most recent frame from the buffer
+            frame = picam2.capture_array()
+            
+            if frame is None:
+                time.sleep(0.01)
+                continue
+
+            # Convert RGB to BGR for OpenCV
+            frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
+            
+            # Pass the frame into the detector and let it draw the boxes
+            if enable_detection:
+                frame = detector(frame, model)
+
+            # Encode and stream
+            ret, encoded_jpg = cv2.imencode(".jpg", frame)
+            if not ret:
+                continue
+
+            yield (
+                b"--frame\r\n"
+                b"Content-Type: image/jpeg\r\n\r\n" + encoded_jpg.tobytes() + b"\r\n"
+            )
+
+        movement_control()
             
     except GeneratorExit:
         logger.info("Client disconnected. Leaving camera running for next connection.")
