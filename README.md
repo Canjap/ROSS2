@@ -1,6 +1,6 @@
 # ROSS2 (Remote Observation & Swarm System v2)
 
-> **ROSS2** is a complete architectural redesign and evolution of the original **ROSS** project. While maintaining the core objective of **remote observation**, ROSS2 completely overhauls the system framework to introduce a distributed **Server + Swarm** topology tailored for tactical operations and search-and-rescue environments.
+**ROSS2** is a complete architectural redesign and evolution of the original **ROSS** project. While maintaining the core objective of **remote observation**, ROSS2 completely overhauls the system framework to introduce a distributed **Server + Swarm** topology tailored for tactical operations and search-and-rescue environments.
 
 ---
 
