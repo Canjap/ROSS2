@@ -7,6 +7,7 @@ import uvicorn
 
 # Import the updated generic generator
 from ross2.slam.vision_pi import stream_local_frames
+from ross2.slam.vision_pi import stream_frames_movement
 
 app = typer.Typer()
 server_app = FastAPI(title="ROSS2 Tunnel Mapping Prototype")
@@ -58,6 +59,36 @@ async def human_detection_feed():
         stream_local_frames(camera_index=-1, enable_detection=True, model="hog"),
         media_type="multipart/x-mixed-replace; boundary=frame",
     )
+# ---------------------------------------------------------
+# ENDPOINT 4: YOLO Human Detection
+# ---------------------------------------------------------
+@server_app.get("/yolo")
+async def human_detection_feed():
+    return StreamingResponse(
+        stream_local_frames(camera_index=-1, enable_detection=True, model="yolo"),
+        media_type="multipart/x-mixed-replace; boundary=frame",
+    )
+
+# ---------------------------------------------------------
+# ENDPOINT 4: YOLO Human Detection
+# ---------------------------------------------------------
+@server_app.get("/move_vision")
+async def human_detection_feed():
+    return StreamingResponse(
+        stream_frames_movement(camera_index=-1, enable_detection=True, model=None),
+        media_type="multipart/x-mixed-replace; boundary=frame",
+    )
+
+
+# ---------------------------------------------------------
+# ENDPOINT 5: Vision with Remote Control Movement
+# ---------------------------------------------------------
+@server_app.get("/move_vision")
+async def human_detection_feed():
+    return StreamingResponse(
+        stream_frames_movement(camera_index=-1, enable_detection=False, model="cascade"),
+        media_type="multipart/x-mixed-replace; boundary=frame",
+    )
 
 @app.command(name="stream_pi")
 def stream_server(port: int = 8080):
@@ -68,10 +99,14 @@ def stream_server(port: int = 8080):
     if active_ip != "127.0.0.1":
         typer.echo(f"  Raw Video Stream:       http://{active_ip}:{port}/live")
         typer.echo(f"  Detection Stream:       http://{active_ip}:{port}/cascade")
-        typer.echo(f"  Detection Stream:       http://{active_ip}:{port}/hog ")        
+        typer.echo(f"  Detection Stream:       http://{active_ip}:{port}/hog ")
+        typer.echo(f"  Detection Stream:       http://{active_ip}:{port}/yolo ")
+        typer.echo(f"  Detection Stream:       http://{active_ip}:{port}/move_vision ")
     else:
         typer.echo(f"  Raw Video Stream:       http://localhost:{port}/live")
         typer.echo(f"  Detection Stream:       http://{active_ip}:{port}/cascade")
-        typer.echo(f"  Detection Stream:       http://{active_ip}:{port}/hog")   
+        typer.echo(f"  Detection Stream:       http://{active_ip}:{port}/hog")
+        typer.echo(f"  Detection Stream:       http://{active_ip}:{port}/yolo ")
+        typer.echo(f"  Detection Stream:       http://{active_ip}:{port}/move_vision ")
     typer.echo("")
     uvicorn.run(server_app, host="0.0.0.0", port=port)
