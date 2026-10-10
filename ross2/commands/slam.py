@@ -2,23 +2,18 @@
 
 from pathlib import Path
 
+from ROSS1.ross.config import MODELS_DIR, OUTPUTS_DIR
 import typer
-
-from ross.config import MODELS_DIR, OUTPUTS_DIR
 
 
 def slam(
-    host: str = typer.Option(
-        None, "--host", help="robot IP or hostname (default: auto-discover)"
-    ),
+    host: str = typer.Option(None, "--host", help="robot IP or hostname (default: auto-discover)"),
     model: str = typer.Option(
         "DPT_Hybrid",
         "--model",
         help="MiDaS model — DPT_Large | DPT_Hybrid | MiDaS_small",
     ),
-    no_imu: bool = typer.Option(
-        False, "--no-imu", help="skip IMU; use pure yaw sweep for pose"
-    ),
+    no_imu: bool = typer.Option(False, "--no-imu", help="skip IMU; use pure yaw sweep for pose"),
     no_yolo: bool = typer.Option(False, "--no-yolo", help="skip human detection"),
     output: Path = typer.Option(
         OUTPUTS_DIR / "scan",
@@ -31,7 +26,7 @@ def slam(
     MODELS_DIR.mkdir(parents=True, exist_ok=True)
     yolo_weights = str(MODELS_DIR / "yolov8n.pt")
 
-    from ross.slam.pipeline import run
+    from ROSS1.ross.slam.pipeline import run
 
     run(
         output=output,

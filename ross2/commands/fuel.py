@@ -3,9 +3,8 @@
 import time
 
 from loguru import logger
+from ROSS1.ross.drivers import fuel_gauge
 import typer
-
-from ross.drivers import fuel_gauge
 
 
 def fuel(

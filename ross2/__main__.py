@@ -1,4 +1,4 @@
-from ross.cli import app
+from ross2.cli import app
 
 if __name__ == "__main__":
     app()

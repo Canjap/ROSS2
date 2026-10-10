@@ -13,9 +13,7 @@ from loguru import logger
 def send_motor(host: str, left: int, right: int, timeout: float = 1.0) -> None:
     """Send a motor command. Failures are logged and swallowed."""
     try:
-        urllib.request.urlopen(
-            f"http://{host}/motor?l={left}&r={right}", timeout=timeout
-        )
+        urllib.request.urlopen(f"http://{host}/motor?l={left}&r={right}", timeout=timeout)
     except Exception as e:
         logger.debug(f"Motor command failed: {e}")
 
